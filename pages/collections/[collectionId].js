@@ -3,7 +3,10 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useWeb3 } from '@3rdweb/hooks'
 import { client } from '../../lib/sanityClient'
-import { ThirdwebSDK } from '@3rdweb/sdk'
+// import  ThirdwebSDK } from '@3rdweb/sdk'
+import { ThirdwebSDK } from "@thirdweb-dev/sdk"
+// import { useContractRead, useContract } from "@thirdweb-dev/react";
+
 import Header from '../../components/Header'
 import { CgWebsite } from 'react-icons/cg'
 import { AiOutlineInstagram, AiOutlineTwitter } from 'react-icons/ai'
@@ -40,37 +43,55 @@ const Collection = () => {
   const [nfts, setNfts] = useState([])
   const [listings, setListings] = useState([])
 
-  //
 
-  const nftModule = useMemo(() => {
+  const nftModule = useMemo( () => {
     if (!provider) return
 
-    const sdk = new ThirdwebSDK(
-      provider.getSigner(),
-      'https://rinkeby.infura.io/v3/a464b9152d8c466c8a94a514fce8e837'
-    )
-    return sdk.getNFTModule(collectionId)
+    const sdk = ThirdwebSDK.fromSigner( provider.getSigner())
+    // const contract = await sdk.getContract(collectionId)
+    return sdk.getContract(collectionId)
   }, [provider])
+
+
+  // ;(async () =>{
+  //   if (!provider) return
+  //   const sdk = ThirdwebSDK.fromSigner(provider.getSigner(),);
+  //   const contract = await sdk.getContract(collectionId)
+  //   const allNFTs = await contract.erc721.getAll();
+  //   console.log(allNFTs)
+  // })();
+
+  
+  // const { data: contract } = useContract("{{collectionId}}");
+  // const { data:nftss, isLoading, error } = useActiveListings(contract);
+  // console.log(nftss)
+  
 
   // get all NFTs in the collection
   useEffect(() => {
     if (!nftModule) return
     ;(async () => {
-      const nfts = await nftModule.getAll()
+      // const nfts = await nftModule.getAll()
+      
+
+      // const nfts = await nftModule.erc721.getAll();
+      const nfts= await (await nftModule).erc721.getAll();
+
+      console.log(nfts)
 
       setNfts(nfts)
     })()
   }, [nftModule])
+  // }, [sdk])
+
 
   const marketPlaceModule = useMemo(() => {
     if (!provider) return
 
-    const sdk = new ThirdwebSDK(
-      provider.getSigner(),
-      'https://rinkeby.infura.io/v3/a464b9152d8c466c8a94a514fce8e837'
-    )
-    return sdk.getMarketplaceModule(
-      '0x93A771F7ce845C33381f677489cF21a5964EDD0b'
+    const sdk = new ThirdwebSDK(provider.getSigner())
+    return sdk.getContract(
+    // return sdk.getMarketplaceModule(
+      '0x588a0EA7E9667797c9E76F766e5dDc3A8d2c7b36',"marketplace-v3"
     )
   }, [provider])
 
@@ -78,12 +99,19 @@ const Collection = () => {
   useEffect(() => {
     if (!marketPlaceModule) return
     ;(async () => {
-      setListings(await marketPlaceModule.getAllListings())
+      const list=await (await marketPlaceModule).directListings.getAllValid()
+      // const li=await (await marketPlaceModule.getAllListings())
+
+      console.log()
+      // setListings(await (await marketPlaceModule).directListings.getAllValid())
+      setListings(list)
     })()
   }, [marketPlaceModule])
 
+  
   const fetchCollectionData = async (sanityClient = client) => {
-    const query = `*[_type == "marketItems" && contractAddress == "${collectionId}" ] {
+    // const query = `*[_type == "marketItems" && contractAddress == "${collectionId}" ] {
+    const query = `*[_type == "marketItems" && contractAddress == "0x66a576A977b7Bccf510630E0aA5e450EC11361Fa" ] {
       "imageUrl": profileImage.asset->url,
       "bannerImageUrl": bannerImage.asset->url,
       volumeTraded,
@@ -97,7 +125,7 @@ const Collection = () => {
 
     const collectionData = await sanityClient.fetch(query)
 
-    console.log(collectionData, '🔥')
+    // console.log(collectionData, '🔥')
 
     // the query returns 1 object inside of an array
     await setCollection(collectionData[0])
@@ -107,8 +135,8 @@ const Collection = () => {
     fetchCollectionData()
   }, [collectionId])
 
-  console.log(router.query)
-  console.log(router.query.collectionId)
+  // console.log(router.query)
+  // console.log(router.query.collectionId)
   return (
     <div className="overflow-hidden">
       <Header />
@@ -182,7 +210,7 @@ const Collection = () => {
             <div className={style.collectionStat}>
               <div className={style.statValue}>
                 <img
-                  src="https://storage.opensea.io/files/6f8e2979d428180222796ff4a33ab929.svg"
+                  src="https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=025"
                   alt="eth"
                   className={style.ethLogo}
                 />
@@ -193,7 +221,7 @@ const Collection = () => {
             <div className={style.collectionStat}>
               <div className={style.statValue}>
                 <img
-                  src="https://storage.opensea.io/files/6f8e2979d428180222796ff4a33ab929.svg"
+                  src="https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=025"
                   alt="eth"
                   className={style.ethLogo}
                 />

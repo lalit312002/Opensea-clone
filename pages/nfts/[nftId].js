@@ -2,6 +2,8 @@ import Header from '../../components/Header'
 import { useEffect, useMemo, useState } from 'react'
 import { useWeb3 } from '@3rdweb/hooks'
 import { ThirdwebSDK } from '@3rdweb/sdk'
+import { ThirdwebSDK as thirdwebSDK} from "@thirdweb-dev/sdk"
+
 import { useRouter } from 'next/router'
 import NFTImage from '../../components/nft/NFTImage'
 import GeneralDetails from '../../components/nft/GeneralDetails'
@@ -25,11 +27,8 @@ const Nft = () => {
   const nftModule = useMemo(() => {
     if (!provider) return
 
-    const sdk = new ThirdwebSDK(
-      provider.getSigner(),
-      'https://rinkeby.infura.io/v3/a464b9152d8c466c8a94a514fce8e837'
-    )
-    return sdk.getNFTModule('0x66a576A977b7Bccf510630E0aA5e450EC11361Fa')
+    const sdk = new ThirdwebSDK(provider.getSigner() )
+    return sdk.getNFTModule('0x40eab2422AeEf9a7775cC0A7Edcd703c278b9cc6')
   }, [provider])
 
   // get all NFTs in the collection
@@ -41,26 +40,46 @@ const Nft = () => {
       const selectedNftItem = nfts.find((nft) => nft.id === router.query.nftId)
 
       setSelectedNft(selectedNftItem)
+      console.log(selectedNftItem)
     })()
   }, [nftModule])
+
+  // const marketPlaceModule = useMemo(() => {
+  //   if (!provider) return
+
+  //   const sdk = new ThirdwebSDK(
+  //     provider.getSigner(),
+  //     // 'https://rinkeby.infura.io/v3/a464b9152d8c466c8a94a514fce8e837'
+  //   )
+
+  //   return sdk.getMarketplaceModule(
+  //     // '0x93A771F7ce845C33381f677489cF21a5964EDD0b'
+  //     '0x588a0EA7E9667797c9E76F766e5dDc3A8d2c7b36'
+  //   )
+  // }, [provider])
+
+  // useEffect(() => {
+  //   if (!marketPlaceModule) return
+  //   ;(async () => {
+  //     setListings(await marketPlaceModule.getAllListings())
+  //     console.log(listings)
+  //   })()
+  // }, [marketPlaceModule])
 
   const marketPlaceModule = useMemo(() => {
     if (!provider) return
 
-    const sdk = new ThirdwebSDK(
-      provider.getSigner(),
-      'https://rinkeby.infura.io/v3/a464b9152d8c466c8a94a514fce8e837'
-    )
-
-    return sdk.getMarketplaceModule(
-      '0x93A771F7ce845C33381f677489cF21a5964EDD0b'
-    )
+    const sdk = new thirdwebSDK(provider.getSigner())
+    return sdk.getContract( '0x588a0EA7E9667797c9E76F766e5dDc3A8d2c7b36',"marketplace-v3")
   }, [provider])
 
+  // get all listings in the collection
   useEffect(() => {
     if (!marketPlaceModule) return
     ;(async () => {
-      setListings(await marketPlaceModule.getAllListings())
+      const li=await (await marketPlaceModule).directListings.getAllValid()
+      console.log(li)
+      setListings(li)
     })()
   }, [marketPlaceModule])
 

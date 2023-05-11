@@ -25,3 +25,9 @@ yarn create next-app --example with-tailwindcss with-tailwindcss-app
 ```
 
 Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+git init
+git add .
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/lalit312002/Opensea-clone.git
+git push -u origin main

@@ -1,4 +1,6 @@
 import React from 'react'
+import Link from 'next/link'
+
 
 const style = {
   wrapper: `relative`,
@@ -30,7 +32,9 @@ const Hero = () => {
               OpenSea is the world&apos;s first and largest NFT marketplace
             </div>
             <div className={style.ctaContainer}>
+              <Link href="/collections/0x40eab2422AeEf9a7775cC0A7Edcd703c278b9cc6">
               <button className={style.accentedButton}>Explore</button>
+              </Link>
               <button className={style.button}>Create</button>
             </div>
           </div>

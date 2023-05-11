@@ -13,15 +13,17 @@ const style = {
 const MakeOffer = ({ isListed, selectedNft, listings, marketPlaceModule }) => {
   const [selectedMarketNft, setSelectedMarketNft] = useState()
   const [enableButton, setEnableButton] = useState(false)
+  const [islisted, setIslisted] = useState(isListed)
 
   useEffect(() => {
-    if (!listings || isListed === 'false') return
+    if (!listings || isListed=='false' ) return
     ;(async () => {
+       await selectedNft
       setSelectedMarketNft(
-        listings.find((marketNft) => marketNft.asset?.id === selectedNft.id)
+        listings.find((marketNft) => marketNft.asset?.id ===  selectedNft?.id)
       )
     })()
-  }, [selectedNft, listings, isListed])
+  }, [selectedNft, listings, islisted])
 
   useEffect(() => {
     if (!selectedMarketNft || !selectedNft) return
@@ -42,28 +44,23 @@ const MakeOffer = ({ isListed, selectedNft, listings, marketPlaceModule }) => {
     quantityDesired = 1,
     module = marketPlaceModule
   ) => {
-    console.log(listingId, quantityDesired, module, 'david')
-    // yo RAZA lets goooo!!!
-    //yo Qazi, ok
-    // sure okay about to run it...
-    // just clicked buy now...
-    // still error
-    // where can i see the contract address of the marketplace module
-    // in [nftId.js]
-    await module
-      .buyoutDirectListing({
-        listingId: listingId,
-        quantityDesired: quantityDesired,
-      })
+    // console.log(listingId, quantityDesired, module, 'david')
+  
+    await (await module)
+      .directListings.buyFromListing(
+        listingId,
+        quantityDesired,
+      )
       .catch((error) => console.error(error))
 
     confirmPurchase()
+    setIslisted('false')
   }
 
   return (
     <div className="flex h-20 w-full items-center rounded-lg border border-[#151c22] bg-[#303339] px-12">
       <Toaster position="bottom-left" reverseOrder={false} />
-      {isListed === 'true' ? (
+      {islisted === 'true' ? (
         <>
           <div
             onClick={() => {
@@ -86,7 +83,8 @@ const MakeOffer = ({ isListed, selectedNft, listings, marketPlaceModule }) => {
           <IoMdWallet className={style.buttonIcon} />
           <div className={style.buttonText}>List Item</div>
         </div>
-      )}
+      )
+      }
     </div>
   )
 }
